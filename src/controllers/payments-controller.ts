@@ -11,7 +11,7 @@ export async function getPaymentByTicketId(req: AuthenticatedRequest, res: Respo
     if (!ticketId) return res.sendStatus(httpStatus.BAD_REQUEST);
 
     const payment = await paymentsService.getPaymentByTicketId(userId, ticketId);
-    if (!payment) return res.sendStatus(httpStatus.NOT_FOUND);
+    if (!payment) return res.sendStatus(httpStatus.PAYMENT_REQUIRED);
 
     return res.status(httpStatus.OK).send(payment);
   } catch (error) {
@@ -27,7 +27,7 @@ export async function paymentProcess(req: AuthenticatedRequest, res: Response, n
     if (!ticketId || !cardData) return res.sendStatus(httpStatus.BAD_REQUEST);
 
     const payment = await paymentsService.paymentProcess(ticketId, userId, cardData);
-    if (!payment) return res.sendStatus(httpStatus.NOT_FOUND);
+    if (!payment) return res.sendStatus(httpStatus.PAYMENT_REQUIRED);
 
     return res.status(httpStatus.OK).send(payment);
   } catch (error) {
