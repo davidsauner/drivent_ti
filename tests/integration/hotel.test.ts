@@ -148,7 +148,6 @@ describe('GET /hotels/:hotelId', () => {
       const ticketType = await createTicketTypeRemote();
       const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
       const payment = await createPayment(ticket.id, ticketType.price);
-      //Hoteis no banco
 
       const response = await server.get('/hotels/1').set('Authorization', `Bearer ${token}`);
 
