@@ -1,28 +1,33 @@
 import httpStatus from 'http-status';
-import { NextFunction, Response } from 'express';
+import { Response } from 'express';
 import { AuthenticatedRequest } from '@/middlewares';
-import hotelsService from '@/services/hotel-service';
+import { hotelService } from '@/services';
 
-export async function getHotels(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-  const { userId } = req;
+export async function getHotels(req: AuthenticatedRequest, res: Response) {
+  const { userId } = req as { userId: number };
 
   try {
-    const hotels = await hotelsService.getHotels(userId);
+    const hotels = await hotelService.getHotels(userId);
     return res.status(httpStatus.OK).send(hotels);
   } catch (error) {
-    next(error);
+    if (error.name === 'BadRequestError') return res.status(httpStatus.BAD_REQUEST).send(error.message);
+    if (error.name === 'PaymentRequiredError') return res.status(httpStatus.PAYMENT_REQUIRED).send(error.message);
+    if (error.name === 'NotFoundError') return res.sendStatus(httpStatus.NOT_FOUND);
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error.message);
   }
 }
 
-export async function getHotelsWithRooms(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-  const { userId } = req;
-  const { hotelId } = req.params;
+export async function getRooms(req: AuthenticatedRequest, res: Response) {
+  const { userId } = req as { userId: number };
+  const id = Number(req.params.hotelId);
 
   try {
-    const hotels = await hotelsService.getHotelsWithRooms(userId, Number(hotelId));
-
-    return res.status(httpStatus.OK).send(hotels);
+    const rooms = await hotelService.getRooms(userId, id);
+    return res.status(httpStatus.OK).send(rooms);
   } catch (error) {
-    next(error);
+    if (error.name === 'BadRequestError') return res.status(httpStatus.BAD_REQUEST).send(error.message);
+    if (error.name === 'PaymentRequiredError') return res.status(httpStatus.PAYMENT_REQUIRED).send(error.message);
+    if (error.name === 'NotFoundError') return res.sendStatus(httpStatus.NOT_FOUND);
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error.message);
   }
 }
